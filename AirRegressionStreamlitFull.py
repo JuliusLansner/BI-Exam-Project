@@ -15,7 +15,7 @@ from sklearn import metrics
 import pickle
 import sklearn.metrics as sm
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-
+import operator
 
 @st.cache
 def load_data():
@@ -28,7 +28,7 @@ df = load_data()
 st.header('AirBNB Price Prediction with Regression')
 
 # Linear Regression
-st.subheader('Linear Regression')
+st.subheader('Linear Regression & Polynomial regression')
 
 X = df['price'].values.reshape(-1,1)
 y = df['reviews_per_month'].values.reshape(-1,1)
@@ -39,31 +39,57 @@ lin_model.fit(X_train,y_train)
 
 y_lin_predict = lin_model.predict(X_test)
 
-st.write(f'Coefficient: {lin_model.coef_}')
-st.write(f'Intercept: {lin_model.intercept_}')
-st.write(f'R2 Score: {lin_model.score(X,y)}')
+
 
 a = lin_model.coef_
 b = lin_model.intercept_
 
+poly_model = PolynomialFeatures(degree=3)
+X_train_poly = poly_model.fit_transform(X_train)
+pol_reg = LinearRegression()
+pol_reg.fit(X_train_poly, y_train)
+X_test_poly = poly_model.transform(X_test)
+y_pred = pol_reg.predict(X_test_poly)
+
+# Sort the values of X_test and the corresponding predictions
+sort_axis = operator.itemgetter(0)
+sorted_zip = sorted(zip(X_test, y_pred), key=sort_axis)
+X_test, y_poly_predict = zip(*sorted_zip)
 # Plot
-plt.title('Linear Regression')
+plt.title('Linear(blue) and Polynomial (red)')
 plt.scatter(X, y, color='green')
 plt.plot(X_train, a*X_train + b, color='blue')
-plt.plot(X_test, y_lin_predict, color='orange')
+
+plt.plot(X_test, y_poly_predict, color='red')
 plt.xlabel('price')
 plt.ylabel('reviews_per_month')
 plt.show()
 st.pyplot(plt)
 plt.clf()
+
+
 # Metrics
 mae = metrics.mean_absolute_error(y_test, y_lin_predict)
 mse = metrics.mean_squared_error(y_test, y_lin_predict)
 rmse = np.sqrt(metrics.mean_squared_error(y_test, y_lin_predict))
-
+st.write('Linear regression MAE,MSE, RMSE')
 st.write(f'MAE: {mae}')
 st.write(f'MSE: {mse}')
 st.write(f'RMSE: {rmse}')
+
+st.write('Linear regression Coef, inter, R2')
+st.write(f'Coefficient: {lin_model.coef_}')
+st.write(f'Intercept: {lin_model.intercept_}')
+st.write(f'R2 Score: {lin_model.score(X,y)}')
+
+st.write('Polynomial Regression')
+mae = metrics.mean_absolute_error(y_test, y_poly_predict)
+mse = metrics.mean_squared_error(y_test, y_poly_predict)
+r2 = metrics.r2_score(y_test, y_poly_predict)
+
+st.write(f'Mean Absolute Error: {mae}')
+st.write(f'Mean Squared Error: {mse}')
+st.write(f'R-squared: {r2}')
 
 
 #Multiple linear regression
@@ -93,7 +119,11 @@ st.write(f'R-squared: {r2}')
 
 # Plot
 plt.title('Multiple Linear Regression')
-plt.scatter(y_test, y_pred, color='blue')
+plt.scatter(X_test.index, y_test, color='blue', label='Actual')
+plt.scatter(X_test.index, y_pred, color='red', label='Predicted')
+plt.xlabel('Index')
+plt.ylabel('Price')
+plt.legend()
 plt.show()
 st.pyplot(plt)
 plt.clf()
