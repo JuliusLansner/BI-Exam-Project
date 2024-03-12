@@ -1,143 +1,122 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
 import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
+import altair as alt 
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+import textwrap
 
-# Load data
-file_path = "/Users/mikkel/Documents/GitHub/cph_airbnb/data/cph_listings_df_clean.csv"
-cph_listings_df = pd.read_csv(file_path)
+# set the width of the entire app
+st.set_page_config(layout="wide")
 
+# load data
+cph_listings_df = pd.read_csv("../data/cph_listings_df_clean.csv")
 
-# Add a title
-st.title("Analyse af Airbnb Data")
+# center title
+st.markdown("<h1 style='text-align: center;'>Visualising Airbnb Data</h1>", unsafe_allow_html=True)
 
+# create 2 columns
+col1, col2 = st.columns([1, 1])
 
-import streamlit as st
+neighbourhood_mapping = {1: 'Vesterbro-Kongens Enghave', 2: 'Nørrebro', 3: 'Indre By', 4: 'Østerbro',
+                            5: 'Frederiksberg', 6: 'Amager Vest', 7: 'Amager st', 8: 'Bispebjerg',
+                            9: 'Valby', 10: 'Vanløse', 11:'Brønshøj-Husum'}
 
-# Opret tre kolonner
-col1, col2, col3 = st.columns(3)
+cph_listings_df['neighbourhood_combined'] = cph_listings_df['neighbourhood_cleansed'].map(neighbourhood_mapping).astype(str)
 
-# Kolonne 1
+# column 1
 with col1:
-    st.header("Kolonne 1")
-    # Tilføj dit indhold til kolonne 1
+    st.header("Hosts")
 
-# Kolonne 2
-with col2:
-    st.header("Kolonne 2")
-    # Tilføj dit indhold til kolonne 2
+    # average acceptance superhosts
+    avg_acceptance_rate_superhost = cph_listings_df[cph_listings_df['host_is_superhost'] == 1]['host_acceptance_rate'].mean()
+    remaining_percentage_superhost = 100 - avg_acceptance_rate_superhost
 
-# Kolonne 3
-with col3:
-    st.header("Kolonne 3")
-
-    neighbourhood_mapping = {'Vesterbro-Kongens Enghave': 1, 'Nørrebro': 2, 'Indre By': 3, 'Østerbro': 4,
-                         'Frederiksberg': 5, 'Amager Vest': 6, 'Amager st': 7, 'Bispebjerg': 8,
-                         'Valby': 9, 'Vanløse': 10, 'Brønshøj-Husum': 11}
-    st.header("Average price pr. neighbourhood")
+    # average acceptance non-superhosts
+    avg_acceptance_rate_non_superhost = cph_listings_df[cph_listings_df['host_is_superhost'] == 0]['host_acceptance_rate'].mean()
+    remaining_percentage_non_superhost = 100 - avg_acceptance_rate_non_superhost
     
-    # Grouper data efter kvarter og gennemsnitlig pris
-    neighbourhood_prices = cph_listings_df.groupby('neighbourhood_cleansed')['price'].mean()
+    # superhost donut chart 
+    fig = px.pie(names=['Superhost', ''], values=[avg_acceptance_rate_superhost, remaining_percentage_superhost],
+                 hole=0.6, color_discrete_sequence=['#636EFA', '#CCCCCC'])
+    fig.update_layout(title='Avg. acc. rate for Superhosts', showlegend=False)
 
-    # Opret en ny kolonne med gennemsnitlig pris pr. kvarter
-    cph_listings_df['price_per_neighbourhood'] = cph_listings_df['neighbourhood_cleansed'].map(neighbourhood_prices)
+    # non-superhost donut chart
+    fig2 = px.pie(names=['Non-Superhost', ''], values=[avg_acceptance_rate_non_superhost, remaining_percentage_non_superhost],
+                 hole=0.6, color_discrete_sequence=['#EF553B', '#CCCCCC'])
+    fig2.update_layout(title='Avg. acc. rate for Non-Superhosts', showlegend=False)
 
-    # Barplot for gennemsnitlig pris pr. kvarter
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x=neighbourhood_prices.index, y=neighbourhood_prices.values, palette="viridis")
+    # dist. of hosts
+    superhost_counts = cph_listings_df['host_is_superhost'].value_counts()
+    fig3 = px.pie(names=superhost_counts.index, values=superhost_counts.values,
+                color_discrete_sequence=['#EF553B', '#636EFA'], title='Distribution of Superhosts vs. Non-Superhosts')
+    fig3.update_layout(title_text='Dist. of Superhosts and Non-Superhosts', showlegend=False)
 
-    plt.title('Gennemsnitlig pris pr. kvarter')
-    plt.xlabel('Kvarter')
-    plt.ylabel('Gennemsnitlig pris')
+    # plot donut charts
+    st.plotly_chart(fig.update_layout(height=400), use_container_width=True)
+    st.plotly_chart(fig2.update_layout(height=400), use_container_width=True)
+    st.plotly_chart(fig3.update_layout(height=400), use_container_width=True)
 
-    # Tilføj forklarende overskrifter uden for plottet
-    plt.legend(labels=[f"{num}: {neighbourhood_mapping[num]}" for num in neighbourhood_mapping], title='Kvarter', bbox_to_anchor=(1.05, 1), loc='upper left')
+# column 2
+with col2:
+    st.header("Pricing")
 
-    # Vis plottet
-    st.pyplot(plt)
+    # bar chart avg price
+    bar_chart = alt.Chart(cph_listings_df).mark_bar().encode(
+    alt.Y('neighbourhood_cleansed:N', title='Neighbourhood'),
+    alt.X('average(price):Q', title='Average Price'),
+    color=alt.Color('neighbourhood_combined:N', title='Neighbourhood'),
+    tooltip=['neighbourhood_combined:N', 'average(price):Q']
+    ).properties(
+        title='Average Neighbourhood Prices'
+    )
 
+    # horisontal bar chart 
+    scatter_chart = alt.Chart(cph_listings_df).mark_circle().encode(
+        alt.Y('neighbourhood_cleansed:N', title='Neighbourhood'),
+        alt.X('price:Q', title='Price'),
+        color=alt.Color('neighbourhood_combined:N', title='Neighbourhood'),
+    ).properties(
+        title='Distribution of Neighbourhood Prices'
+    )
 
-# Question 1: Hvad påvirker prisen på ens Airbnb
-st.header("1. Hvad påvirker prisen på ens Airbnb?")
+    # violin plot for price distribution
+    fig, ax = plt.subplots()
+    sns.violinplot(y=cph_listings_df['price'], palette="Set3", bw=0.5, ax=ax)
+    ax.set_title('Price Distribution')
 
-
-# groupe data by neightbourhood and average price
-neighbourhood_prices = cph_listings_df.groupby('neighbourhood_cleansed')['price'].mean()
-
-# create a new column with average price per neighbourhood
-cph_listings_df['price_per_neighbourhood'] = cph_listings_df['neighbourhood_cleansed'].map(neighbourhood_prices)
-
-# Question 2: Kan man øge indkomsten fra ens Airbnb
-st.header("2. Kan man øge indkomsten fra ens Airbnb?")
-
-# Question 3: Hvilke Airbnb typer tjener mest per år
-st.header("3. Hvilke Airbnb typer tjener mest per år?")
-
-
-
-
-# Question 4: Kan anmeldelser påvirke ens salg
-st.header("4. Kan anmeldelser påvirke ens salg?")
-
-
-
-
-
-# Feature engineering
-feature_data = cph_listings_df[['price', 'number_of_reviews']]
-scaler = StandardScaler()
-standardized_data = scaler.fit_transform(feature_data)
-
-# K-Means clustering
-num_clusters = range(1, 11)
-inertia_values = []
-
-for k in num_clusters:
-    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-    kmeans.fit(standardized_data)
-    inertia_values.append(kmeans.inertia_)
-
-# Set number of clusters
-num_clusters = 9
-
-# Create KMeans model
-kmeans = KMeans(init='k-means++', n_clusters=num_clusters, n_init=20)
-kmeans.fit(standardized_data)
-
-# Predict clusters
-cluster_predictions = kmeans.predict(standardized_data)
-
-# Create KMeans model
-kmeans = KMeans(init='k-means++', n_clusters=num_clusters, n_init=20)
-kmeans.fit(standardized_data)
-
-# Explore centroids
-cluster_centers = kmeans.cluster_centers_
-
-# Predict clusters
-cluster_predictions = kmeans.predict(standardized_data)
+    st.altair_chart(bar_chart.properties(height=400), use_container_width=True)
+    st.altair_chart(scatter_chart.properties(height=400), use_container_width=True)
+    st.pyplot(fig, use_container_width=True)
 
 
+st.header("Reviews")
 
-# 3D Scatter Plot
-st.header("3D Scatter Plot af KMeans Clusters")
+# interactive scatter plot
+scatter_plot = alt.Chart(cph_listings_df).mark_circle().encode(
+    x=alt.X('review_scores_rating:Q', title='Review Score Rating'),
+    y=alt.Y('price:Q', title='Price'),
+    color=alt.Color('neighbourhood_combined:N', title='Neighbourhood'),
+    tooltip=['price:Q', 'review_scores_rating:Q']
+).properties(
+    title='Price vs Review Score Rating'
+).interactive()
 
-df_3d_cluster = pd.DataFrame({
-    'feature1': standardized_data[:, 0],
-    'feature2': standardized_data[:, 1],
-    'cluster_label': cluster_predictions
-})
+st.altair_chart(scatter_plot, use_container_width=True)
 
-fig = px.scatter_3d(df_3d_cluster, x='feature1', y='feature2', z='cluster_label', color='cluster_label',
-                    opacity=0.7, color_discrete_sequence=px.colors.qualitative.Set1)
+st.header("Listings")
 
-fig.update_layout(scene=dict(xaxis_title='Price', yaxis_title='Number of reviews', zaxis_title='Cluster'),
-                  coloraxis_colorbar=dict(title='Cluster'))
+# interactive bar chart
+bar_chart = alt.Chart(cph_listings_df).mark_bar().encode(
+    x=alt.X('neighbourhood_cleansed:N', title='Neighbourhood'),
+    y=alt.Y('count()', title='Number of Listings'),
+    color=alt.Color('neighbourhood_combined:N', title='Neighbourhood'),
+    tooltip=['neighbourhood_combined:N', 'count()']
+).properties(
+    title='Number of Listings per Neighbourhood'
+).interactive()
 
-st.plotly_chart(fig)
-
-
-
+st.altair_chart(bar_chart, use_container_width=True)

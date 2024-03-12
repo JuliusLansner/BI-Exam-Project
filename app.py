@@ -8,7 +8,7 @@ from PIL import Image
 # title 
 st.markdown("<h1 style='text-align: center;'>Airbnbs in Copenhagen 2023</h1>", unsafe_allow_html=True)
 
-# # image
+#image
 logo = Image.open('media/airbnb.png')
 st.image(logo, use_column_width=True)
 
