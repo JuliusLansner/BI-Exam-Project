@@ -71,4 +71,11 @@ if st.button('Predict Price'):
     st.write(f'Predicted Price: {round(prediction[0][0])},- for a minimum of a 3-5 day stay')
  
 
-
+st.write('Model specifications: ')
+st.write('Artifical Neural Network')
+st.write('Batchsize: 32')
+st.write('Layers: 4 - Neurons: 64,32,16,8')
+st.write('Batch Normalization')
+st.write('Epochs: 50')
+st.write('Activation function: relu')
+st.write('Learning rate: 0.01')
