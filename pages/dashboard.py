@@ -96,7 +96,6 @@ with col2:
     st.altair_chart(scatter_chart.properties(height=400), use_container_width=True)
     st.pyplot(fig, use_container_width=True)
 
-
 st.header("Reviews")
 
 # interactive scatter plot
