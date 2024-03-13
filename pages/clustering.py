@@ -11,10 +11,16 @@ from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 from yellowbrick.cluster import SilhouetteVisualizer
 
+# paths
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'cph_listings_df_clean.csv'))
+model_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models'))
+model_path = os.path.join(model_folder, 'kmeans_model.joblib')
 
 # load data
 cph_listings_df = pd.read_csv(file_path)
+
+# load model 
+kmeans_model = joblib.load(model_path)
 
 st.title('Copenhagen Airbnb Clustering')
 st.subheader('Purpose and Description')
@@ -27,21 +33,19 @@ scaler = StandardScaler()
 feature_data = cph_listings_df[['price', 'number_of_reviews']]
 standardized_data = scaler.fit_transform(feature_data)
 
-# Define function to perform KMeans clustering
-def perform_kmeans(data, num_clusters):
-    kmeans = KMeans(n_clusters=num_clusters, init='k-means++', n_init=20, random_state=42)
-    kmeans.fit(data)
-    cluster_predictions = kmeans.predict(data)
+# method to perform KMeans clustering
+def perform_kmeans(data):
+    cluster_predictions = kmeans_model.predict(data)
     silhouette_avg = silhouette_score(data, cluster_predictions)
-    return kmeans, cluster_predictions, silhouette_avg
+    return cluster_predictions, silhouette_avg
 
 # input for number of clusters
 st.sidebar.title('KMeans Clustering')
 st.sidebar.subheader('Here you can adjust the number of clusters')
-num_clusters = st.sidebar.slider('Select number of clusters', min_value=2, max_value=15, value=9)
+num_clusters = st.sidebar.slider('Select number of clusters', min_value=2, max_value=9, value=9)
 
 # perform KMeans clustering
-kmeans_model, cluster_predictions, silhouette_avg = perform_kmeans(standardized_data, num_clusters)
+cluster_predictions, silhouette_avg = perform_kmeans(standardized_data)
 
 st.subheader('Clusters visualized')
 
@@ -111,15 +115,15 @@ st.write(original_centers_df)
 # sidebar input for cluster selection
 st.sidebar.title('Select a  cluster that fits your needs')
 cluster_names = {
-    0: 'Budget tested',
-    1: 'Low End',
-    2: 'High End',
+    0: 'Lower End',
+    1: 'Mid',
+    2: 'Tight budget',
     3: 'Cheap and Reviewed',
-    4: 'Lower End',
-    5: 'Tight budget',
-    6: 'Mid',
-    7: 'Low - Mid',
-    8: 'Lower mid range',
+    4: 'Lower End Reviewed',
+    5: 'High End',
+    6: 'Lower End',
+    7: 'Low - Mid Tested',
+    8: 'Lower Mid ',
 }
 
 selected_cluster_name = st.sidebar.selectbox('Select cluster:', options=list(cluster_names.values()))
