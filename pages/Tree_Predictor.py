@@ -17,17 +17,11 @@ pd.set_option('display.max_columns', None)
 
 df.drop(columns=['availability_interval','acceptance_rate_interval'],inplace=True)
 
-
-
-
-
 df = df[['availability_365','reviews_per_month','neighbourhood_cleansed', 'property_type', 'room_type', 'accommodates', 'bathrooms', 'beds', 'price']]
 
-def drop_high_prices(price_cut):
-    df.drop(df[df['price'] > price_cut].index, inplace=True)
+df.drop(df[df['price'] > st.slider('Cut Price:', min_value=0, max_value=10000, value=12000, step=100)].index, inplace=True)
 
-def drop_high_accommodates(accommodates_cut):
-    df.drop(df[df['accommodates'] > accommodates_cut].index, inplace=True)
+df.drop(df[df['accommodates'] > st.slider('Cut accommodates:', min_value=0, max_value=16, value=16, step=1)].index, inplace=True)
 
 
 
@@ -35,21 +29,7 @@ def drop_high_accommodates(accommodates_cut):
 num_bins = [0,100,200,500,800,1000,2000,10000,100000]
 
 df['price_intervals'] = pd.cut(df['price'],bins=num_bins) 
-
-
-
-
-
 df['price_intervals'] = df['price_intervals'].astype(str)
-
-
-
-
-
-
-
-
-
 
 
 
@@ -227,11 +207,6 @@ def availability_prices():
 
 
 
-
-
-
-
-
 def accommodates_prices():
  plt.clf()
  accommodates_summary = df.groupby('accommodates')['price'].agg(['count', 'mean'])
@@ -304,9 +279,6 @@ def outliers_accommodates():
 
 
 
-# Clear cache for functions that modify the DataFrame
-drop_high_prices = st.cache_data(drop_high_prices)
-drop_high_accommodates = st.cache_data(drop_high_accommodates)
 
 # Viser titlen på appen
 st.title('Model to predict rental price interval')
@@ -342,17 +314,6 @@ def show_test_scores():
 
 show_test_scores()
 
-st.header('Cut some of the outliers -> see how it affects the model accuracy.')
-cut_price = st.slider('Cut Price:', min_value=0, max_value=10000, value=12000, step=100)
-
-cut_accommodates = st.slider('Cut accommodates:', min_value=0, max_value=16, value=16, step=1)
-
-if st.button('Drop High Prices'):
-    drop_high_prices(cut_price)
-    
-
-if st.button('Drop High Accommodates'):
-    drop_high_accommodates(cut_accommodates)
     
 #Viser outliers
 def show_outliers():
