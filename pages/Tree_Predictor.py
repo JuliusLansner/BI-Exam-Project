@@ -228,7 +228,6 @@ def availability_prices():
 
 
 
-df['accommodates'].unique()
 
 
 
@@ -331,14 +330,17 @@ if st.button('Predict Rental Price interval'):
     st.write(f'Predicted rental price interval: {prediction}')
 
 # Viser test resultater
-test_score = accuracy_test_set() 
-st.write(f'Test score: {test_score}')  
+def show_test_scores():
+    test_score = accuracy_test_set() 
+    st.write(f'Test score: {test_score}')  
 
-test_score_whole = accuracy_whole_set()
-st.write(f'Whole set score: {test_score_whole}')
+    test_score_whole = accuracy_whole_set()
+    st.write(f'Whole set score: {test_score_whole}')
 
-cv_scores = cross_val_scores()
-st.write(f'Cross-Validation Scores: {cv_scores}')
+    cv_scores = cross_val_scores()
+    st.write(f'Cross-Validation Scores: {cv_scores}')
+
+show_test_scores()
 
 st.header('Cut some of the outliers -> see how it affects the model accuracy.')
 cut_price = st.slider('Cut Price:', min_value=0, max_value=10000, value=12000, step=100)
@@ -352,12 +354,15 @@ if st.button('Drop High Prices'):
 if st.button('Drop High Accommodates'):
     drop_high_accommodates(cut_accommodates)
     
+#Viser outliers
+def show_outliers():
+    plt_price = outliers_price()
+    st.pyplot(plt_price)
 
-plt = outliers_price()
-st.pyplot(plt)
+    plt_accommodates = outliers_accommodates()
+    st.pyplot(plt_accommodates)
 
-plt = outliers_accommodates()
-st.pyplot(plt)
+show_outliers()
 
 # Viser diverse grafer.
 plt = feature_imprtances()
