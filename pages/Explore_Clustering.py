@@ -50,7 +50,7 @@ cluster_predictions, silhouette_avg = perform_kmeans(standardized_data)
 st.subheader('Clusters visualized')
 
 # visualize clusters
-fig, ax = plt.subplots(figsize=(10, 8))
+fig, ax = plt.subplots(figsize=(6, 6))
 sns.scatterplot(x=standardized_data[:, 0], y=standardized_data[:, 1], hue=cluster_predictions, palette='pastel', s=100, alpha=0.7, ax=ax)
 ax.set_title('KMeans Clusters')
 ax.set_xlabel('Price')
