@@ -71,7 +71,6 @@ st.subheader('View the silhouette score')
 st.write(f'Silhouette Score: {silhouette_avg:.3f}')
 
 st.subheader('Get a better insight and feeling of each cluster')
-
 # 3D scatter plot
 df_3d_cluster = pd.DataFrame({
     'feature1': standardized_data[:, 0],
@@ -110,7 +109,6 @@ st.subheader('View centroids')
 # display original centroids
 st.write("Original Centroids:")
 st.write(original_centers_df)
-
 
 # sidebar input for cluster selection
 st.sidebar.title('Select a  cluster that fits your needs')
