@@ -1,3 +1,8 @@
+# Group:
+[Mikkel:](https://github.com/cph-mh1088)
+[Malde:](https://github.com/MaldeFrank)
+[Julius:](https://github.com/JuliusLansner)
+
 # Problem and context:
 We live in a world with rising competition for AirBnB owners, as well as users having an overwhelmingly large choice of rentals. We want to figure out how various factors such as location, reviews, and population density affect the pricing of Airbnbs in Copenhagen.
 
