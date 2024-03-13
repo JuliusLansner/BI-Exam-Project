@@ -1,19 +1,23 @@
-import streamlit as st
+import os
 import pandas as pd
+import textwrap
+import numpy as np
+import streamlit as st
 import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
 import altair as alt 
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-import textwrap
 
 # set the width of the entire app
 st.set_page_config(layout="wide")
 
+# path 
+file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'cph_listings_df_clean.csv'))
+
 # load data
-cph_listings_df = pd.read_csv("../data/cph_listings_df_clean.csv")
+cph_listings_df = pd.read_csv(file_path)
 
 # center title
 st.markdown("<h1 style='text-align: center;'>Visualising Airbnb Data</h1>", unsafe_allow_html=True)
