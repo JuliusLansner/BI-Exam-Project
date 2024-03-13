@@ -17,7 +17,7 @@ import sklearn.metrics as sm
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import operator
 
-@st.cache
+@st.cache_data
 def load_data():
     df = pd.read_csv('data/airbnbcleaned.csv')
     df = df.drop(['id','host_id'], axis=1)
@@ -177,7 +177,7 @@ for i in range(X.shape[1]):
 
 from keras.models import load_model
 
-model = load_model('ann_model.h5')
+model = load_model('models/ann_model.h5')
 # Create inputs for the user to enter values
 availability_365 = st.number_input('Enter how many days your property is available out of 365')
 accommodates = st.number_input('Enter how many people the property can fit')

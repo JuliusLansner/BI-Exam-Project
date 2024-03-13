@@ -1,8 +1,8 @@
-import Tree_price_estimater_classifier
-from Tree_price_estimater_classifier import predict_rental, accuracy_test_set, accuracy_whole_set, cross_val_scores, feature_imprtances, availability_prices, accommodates_prices, outliers_price, drop_high_prices, outliers_accommodates, drop_high_accommodates
+
 import graphviz
 import streamlit as st
 
+from Tree_price_estimater_classifier import predict_rental, accuracy_test_set, accuracy_whole_set, cross_val_scores, feature_imprtances, availability_prices, accommodates_prices, outliers_price, drop_high_prices, outliers_accommodates, drop_high_accommodates
 # Clear cache for functions that modify the DataFrame
 drop_high_prices = st.cache_data(drop_high_prices)
 drop_high_accommodates = st.cache_data(drop_high_accommodates)

@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
 
-# In[1]:
+import graphviz
+import streamlit as st
 
 
 import pandas as pd
@@ -9,40 +8,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# In[2]:
 
 
-df = pd.read_csv("cleaned_data.csv")
+df = pd.read_csv("data/cleaned_data.csv")
 pd.set_option('display.max_columns', None)
 
-
-# In[3]:
-
-
-df
-
-
-# In[4]:
-
-
-df.shape
-
-
-# In[5]:
-
-
-df.dtypes
-
-
 # Dropping non numeric columns
-
-# In[6]:
-
 
 df.drop(columns=['availability_interval','acceptance_rate_interval'],inplace=True)
 
 
-# In[7]:
+
 
 
 df = df[['availability_365','reviews_per_month','neighbourhood_cleansed', 'property_type', 'room_type', 'accommodates', 'bathrooms', 'beds', 'price']]
@@ -53,7 +29,7 @@ def drop_high_prices(price_cut):
 def drop_high_accommodates(accommodates_cut):
     df.drop(df[df['accommodates'] > accommodates_cut].index, inplace=True)
 
-# In[8]:
+
 
 
 num_bins = [0,100,200,500,800,1000,2000,10000,100000]
@@ -61,27 +37,24 @@ num_bins = [0,100,200,500,800,1000,2000,10000,100000]
 df['price_intervals'] = pd.cut(df['price'],bins=num_bins) 
 
 
-# In[9]:
+
 
 
 df['price_intervals'] = df['price_intervals'].astype(str)
 
 
-# In[10]:
 
 
-df
 
 
-# In[11]:
 
 
-df.shape
 
 
-# Starting training of descision tree model
 
-# In[12]:
+
+
+
 
 
 from sklearn import tree
@@ -89,9 +62,7 @@ params = {'max_depth': 5}
 model = tree.DecisionTreeClassifier(**params)
 
 
-# Splitting values from df into x and y and making training and test sets.
 
-# In[13]:
 
 
 from sklearn.model_selection import train_test_split
@@ -102,15 +73,12 @@ y = df['price_intervals'].values
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=7)
 
 
-# Training model.
 
-# In[14]:
 
 
 model.fit(X_train, y_train)
 
 
-# In[18]:
 
 
 import graphviz
@@ -121,17 +89,9 @@ def getTree():
  dtree = graphviz.Source(gr_data)
  return dtree
 
-# In[19]:
 
 
 
-# In[20]:
-
-
-
-# See the classes.
-
-# In[21]:
 
 
 classes = model.classes_
@@ -140,34 +100,18 @@ for i, class_label in enumerate(classes):
     print(f"Class {i+1}: {class_label}")
 
 
-# # Predict values
-
-# Predict values and show predictions.
-
-# In[22]:
-
-
 predictions = model.predict(X_test)
 
 
-# In[23]:
-
-
 predictions2 = model.predict(X)
-
-
-# In[24]:
 
 
 for index, prediction in enumerate(predictions):
     print(f"Index {index}: Predicted class {prediction}")
 
 
-# # See how good the model is.
 
-# model 1
 
-# In[25]:
 
 
 from sklearn.metrics import accuracy_score
@@ -178,19 +122,13 @@ def accuracy_test_set():
  return accuracy
 
 
-# Doing another test on the whole dataset.
 
-# In[26]:
+
 
 def accuracy_whole_set():
  accuracy2 = accuracy_score(y,predictions2)
  accuracy2
  return accuracy2
-
-
-# Doing cross_val_scores.
-
-# In[27]:
 
 
 from sklearn.model_selection import cross_val_score, KFold
@@ -202,22 +140,12 @@ def cross_val_scores():
 
 
 
-# Checking feature importances.
-
-# In[28]:
-
-
-model.feature_importances_
-
-
-# In[29]:
-
 
 df_features = df.drop(columns=['price'])
-df_features
 
 
-# In[30]:
+
+
 
 
 feature = df_features.columns
@@ -232,12 +160,6 @@ def feature_imprtances():
  plt.xlabel('Relative Importance')
  plt.show() 
  return plt
-
-# model 2
-
-# Making a function to predict price interval.
-
-# In[31]:
 
 
 def predict_rental(availability_365,reviews_per_month,neighbourhood, property_type, room_type, accommodates, bathrooms, beds):
@@ -267,7 +189,7 @@ def predict_rental(availability_365,reviews_per_month,neighbourhood, property_ty
     return prediction
 
 
-# In[35]:
+
 def availability_prices():
  plt.clf()
  bin_edges = [0, 50, 100, 150, 200, 250, 300, 365]
@@ -303,13 +225,13 @@ def availability_prices():
  plt.show()
  return plt
 
-# In[36]:
+
 
 
 df['accommodates'].unique()
 
 
-# In[42]:
+
 
 def accommodates_prices():
  plt.clf()
@@ -379,7 +301,70 @@ def outliers_accommodates():
     plt.legend()
     plt.show()
     return plt
-# In[ ]:
 
 
 
+
+# Clear cache for functions that modify the DataFrame
+drop_high_prices = st.cache_data(drop_high_prices)
+drop_high_accommodates = st.cache_data(drop_high_accommodates)
+
+# Viser titlen på appen
+st.title('Model to predict rental price interval')
+
+# Viser model og input til den
+reviews_per_month = st.number_input('Reviews per month', value=0.0)
+neighbourhood = st.selectbox('Neighbourhood', ['Vesterbro-Kongens Enghave', 'Nørrebro', 'Indre By', 'Østerbro',
+                                               'Frederiksberg', 'Amager Vest', 'Amager st', 'Bispebjerg',
+                                               'Valby', 'Vanløse', 'Brønshøj-Husum'])
+property_type = st.selectbox('Property Type', ['Entire rental unit', 'Entire condo',
+                                               'Private room in rental unit', 'Entire home'])
+room_type = st.selectbox('Room Type', ['Entire home/apt', 'Private room', 'Shared room', 'Hotel room'])
+accommodates = st.number_input('Accommodates', value=1)
+bathrooms = st.number_input('Bathrooms', value=1.0)
+beds = st.number_input('Beds', value=1.0)
+availability_365 = st.number_input('Availability 365', value=0)
+
+
+if st.button('Predict Rental Price interval'):
+    prediction = predict_rental(availability_365, reviews_per_month, neighbourhood, property_type, room_type, accommodates, bathrooms, beds)
+    st.write(f'Predicted rental price interval: {prediction}')
+
+# Viser test resultater
+test_score = accuracy_test_set() 
+st.write(f'Test score: {test_score}')  
+
+test_score_whole = accuracy_whole_set()
+st.write(f'Whole set score: {test_score_whole}')
+
+cv_scores = cross_val_scores()
+st.write(f'Cross-Validation Scores: {cv_scores}')
+
+st.header('Cut some of the outliers -> see how it affects the model accuracy.')
+cut_price = st.slider('Cut Price:', min_value=0, max_value=10000, value=12000, step=100)
+
+cut_accommodates = st.slider('Cut accommodates:', min_value=0, max_value=16, value=16, step=1)
+
+if st.button('Drop High Prices'):
+    drop_high_prices(cut_price)
+    
+
+if st.button('Drop High Accommodates'):
+    drop_high_accommodates(cut_accommodates)
+    
+
+plt = outliers_price()
+st.pyplot(plt)
+
+plt = outliers_accommodates()
+st.pyplot(plt)
+
+# Viser diverse grafer.
+plt = feature_imprtances()
+st.pyplot(plt)
+
+plt = availability_prices()
+st.pyplot(plt)
+
+plt = accommodates_prices()
+st.pyplot(plt)
