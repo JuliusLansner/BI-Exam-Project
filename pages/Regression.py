@@ -1,4 +1,3 @@
-# Linear Regression on AirBNB cleaned data
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -16,19 +15,18 @@ import pickle
 import sklearn.metrics as sm
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import operator
-
+import tensorflow as tf
+import datetime
+import os
+from keras.callbacks import TensorBoard
 @st.cache_data
 def load_data():
     df = pd.read_csv('data/airbnbcleaned.csv')
     df = df.drop(['id','host_id'], axis=1)
     return df
 df = load_data()
-
-# Main
-st.header('AirBNB Price Prediction with Regression')
-
 # Linear Regression
-st.subheader('Linear Regression & Polynomial regression')
+st.subheader('---Linear Regression & Polynomial regression---')
 
 X = df['price'].values.reshape(-1,1)
 y = df['reviews_per_month'].values.reshape(-1,1)
@@ -72,17 +70,17 @@ plt.clf()
 mae = metrics.mean_absolute_error(y_test, y_lin_predict)
 mse = metrics.mean_squared_error(y_test, y_lin_predict)
 rmse = np.sqrt(metrics.mean_squared_error(y_test, y_lin_predict))
-st.write('Linear regression MAE,MSE, RMSE')
+st.write('----Linear regression MAE,MSE, RMSE----')
 st.write(f'MAE: {mae}')
 st.write(f'MSE: {mse}')
 st.write(f'RMSE: {rmse}')
 
-st.write('Linear regression Coef, inter, R2')
+st.write('----Linear regression Coef, inter, R2----')
 st.write(f'Coefficient: {lin_model.coef_}')
 st.write(f'Intercept: {lin_model.intercept_}')
 st.write(f'R2 Score: {lin_model.score(X,y)}')
 
-st.write('Polynomial Regression')
+st.write('----Polynomial Regression----')
 mae = metrics.mean_absolute_error(y_test, y_poly_predict)
 mse = metrics.mean_squared_error(y_test, y_poly_predict)
 r2 = metrics.r2_score(y_test, y_poly_predict)
@@ -93,7 +91,7 @@ st.write(f'R-squared: {r2}')
 
 
 #Multiple linear regression
-st.subheader('Multiple Linear regression')
+st.subheader('----Multiple Linear regression----')
 
 X = df[['neighbourhood_cleansed', 'beds', 'bathrooms','accommodates']]
 y = df['price']  
@@ -175,22 +173,3 @@ for i in range(X.shape[1]):
     st.pyplot(plt)
     plt.clf()
 
-from keras.models import load_model
-
-model = load_model('models/ann_model.h5')
-# Create inputs for the user to enter values
-availability_365 = st.number_input('Enter how many days your property is available out of 365')
-accommodates = st.number_input('Enter how many people the property can fit')
-neighbourhood_cleansed = st.number_input('Enter neighborhood')
-beds = st.number_input('how many beds/bedrooms?')
-bathrooms = st.number_input('how many bathrooms?')
-# Button to make prediction
-if st.button('Predict Price'):
-    # Create a numpy array of the inputs
-    input_data = np.array([[availability_365, accommodates, neighbourhood_cleansed, beds, bathrooms]])
-
-    # Make the prediction
-    prediction = model.predict(input_data)
-
-    # Display the prediction
-    st.write(f'Predicted Price: {prediction[0][0]} for a 3-5 day stay')
