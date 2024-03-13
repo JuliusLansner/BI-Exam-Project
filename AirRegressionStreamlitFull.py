@@ -175,3 +175,30 @@ for i in range(X.shape[1]):
     st.pyplot(plt)
     plt.clf()
 
+from keras.models import load_model
+# Define your mapping
+neighborhood_mapping = {
+    'X': 1,
+    'Y': 2,
+   
+}
+
+model = load_model('ann_model.h5')
+# Create inputs for the user to enter values
+availability_365 = st.number_input('Enter how many days your property is available out of 365')
+accommodates = st.number_input('Enter how many people the property can fit')
+neighbourhood = st.number_input('Enter neighborhood')
+beds = st.number_input('how many beds/bedrooms?')
+bathrooms = st.number_input('how many bathrooms?')
+
+neighborhood_cleansed = neighborhood_mapping.get(neighbourhood)
+
+if st.button('Predict Price'):
+    
+    input_data = np.array([[availability_365, accommodates, neighborhood_cleansed, beds, bathrooms]])
+
+  
+    prediction = model.predict(input_data)
+
+   
+    st.write(f'Predicted Price: {prediction[0][0]} for a 3-5 day stay')
