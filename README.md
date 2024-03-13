@@ -1,25 +1,33 @@
+Problem and context:
+We live in a world with rising competition for AirBnB owners, as well as users having an overwhelmingly large choice of rentals. We want to figure out how various factors such as location, reviews, and population density affect the pricing of Airbnbs in Copenhagen.
 
-Kontekst: 
-Vi lever i en verden hvor der kommer stigende konkurrence for airbnb ejere samt stigende forbrug af airbnb, potentielt grundet stigende priser og suboptimale lokationer på hoteller.
+Purpose:
+We want to explore the Copenhagen AirBnB rental market as to figure out how an owner can properly price their property, along with potentially gaining insight into increasing profits. We also want to give the user an insight in the market of their chosen area in Copenhagen.
 
-Formål:
-Formålet med dette projekt er at finde en sammenhæng via. BI der kan hjælpe Airbnb udlejere med at træffe informerede beslutninger om prissættelse, samt hvordan de kan forbedre deres indtjening
+Research questions:
 
-Research spørgsmål:
-Hvad påvirker prisen på ens airbnb.
-Kan man øge indkomsten fra ens airbnb.
-Kan man få en god fortjeneste ved at købe bolig, kun med det formål at udleje på airbnb.
-Hvor er det bedst at købe lejlighed eller hus hvis man har til formål at tjene på det.
-Kan anmeldelser påvirke ens salg.
+What affects the price of an owners AirBnB.
 
-Hypotese: 
+Can you increase profits from ones AirBnB.
 
-Beliggenhed og faciliteter har betydelig indflydelse på prissætningen
-Årstiden påvirker efterspørgslen og prissætningen af udlejningsmålet
-Udlejers Indkomst kan øges ved at prisen reflekterer udbud og efterspørgsel
-Vi tror at anmeldelser spiller en rolle ift. udlejning af lejemål.
-Vi tror at man kan tjene godt på sit udlejning spørgsmål
+Does the population density matter in terms of the price?
+
+Does the population density increase the amount of AirBnbs?
 
 
+Hypotheses: 
 
-Dette projekt har til hensigt at observere data for copenhagen airbnb opholdssteder for at kunne give en fyldestgørende idé om, hvad en ejer af en airbnb specifikt kan gøre  for at øge profit, bl.a. ved at sammenligne lokationer/priser, men også via. lejemålets tilstand og reviews/faciliteter. Vi har som mål at få airbnb ejere til at øge profit og for brugeren at klargøre valg af airbnb.
+Placement, accomodations and facilities have a noticable influence on price.
+
+Owners income can be increased by recalibrating their price to supply / demand
+
+We think that reviews play a big role in terms of price.
+
+
+Argumentation of choices:
+Sources:
+
+Outcomes:
+
+
+
