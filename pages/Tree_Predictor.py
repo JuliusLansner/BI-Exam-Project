@@ -112,13 +112,13 @@ def accuracy_whole_set():
 
 
 from sklearn.model_selection import cross_val_score, KFold
-
+n_folds = 5
+cv_scores = cross_val_score(model, X, y, cv=KFold(n_folds, shuffle=True, random_state=42))
 def cross_val_scores():
- n_folds = 5
- cv_scores = cross_val_score(model, X, y, cv=KFold(n_folds, shuffle=True, random_state=42))
  return cv_scores
 
-
+def get_average_cross_val_score():
+    return np.mean(cv_scores)
 
 
 df_features = df.drop(columns=['price'])
@@ -311,6 +311,9 @@ def show_test_scores():
 
     cv_scores = cross_val_scores()
     st.write(f'Cross-Validation Scores: {cv_scores}')
+
+    cv_average = get_average_cross_val_score()
+    st.write(f'Average Cross-Validation Score: {cv_average}')
 
 show_test_scores()
 
