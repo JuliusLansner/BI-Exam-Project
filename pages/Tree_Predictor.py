@@ -38,8 +38,8 @@ df['price_intervals'] = df['price_intervals'].astype(str)
 
 
 from sklearn import tree
-params = {'max_depth': 5}
-model = tree.DecisionTreeClassifier(**params)
+params = st.slider('Choose max tree depth:', min_value=2, max_value=100, value=5, step=1)
+model = tree.DecisionTreeClassifier(max_depth=params)
 
 
 
