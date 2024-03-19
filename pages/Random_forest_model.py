@@ -76,11 +76,16 @@ for cluster_label, interval in cluster_intervals.items():
 
 from sklearn.ensemble import RandomForestClassifier
 
+num_trees = st.sidebar.slider('Select number of trees', min_value=2, max_value=100, value=100)
+max_depth = st.sidebar.slider('Select max depth of trees', min_value=2, max_value=100, value=10)
+min_samples_split = st.sidebar.slider('Select min samples split', min_value=2, max_value=100, value=20)
+
+# Create the Random Forest classifier with the specified parameters
 random_forest_classifier = RandomForestClassifier(
-    n_estimators=100,
+    n_estimators=num_trees,
     criterion="gini", 
-    max_depth= 10,
-    min_samples_split= 20,
+    max_depth=max_depth,
+    min_samples_split=min_samples_split,
     random_state=7)
 
 
@@ -116,6 +121,9 @@ cv_scores = cross_val_score(random_forest_classifier, X, y, cv=KFold(n_folds, sh
 
 def get_cross_val_score():
     return cv_scores
+
+def get_average_cross_val_score():
+    return np.mean(cv_scores)
 
 
 
@@ -185,17 +193,21 @@ for interval in unique_intervals:
     st.write(interval)
 
 st.header("Random Forest Classifier Parameters:")
-st.text("- n_estimators: 100")
+st.text("- n_estimators: "+str(num_trees))
 st.text("- criterion: gini")
-st.text("- max_depth: 10")
-st.text("- min_samples_split: 20")
+st.text("- max_depth: "+str(max_depth))
+st.text("- min_samples_split: "+str(min_samples_split))
 st.text("- random_state: 7")
+
 
 st.header('Model Evaluation')
 st.write("Accuracy of the model is: ", get_accuracy())
 
 cv_scores = get_cross_val_score()
 st.write(f'Cross-Validation Scores: {cv_scores}')
+
+cv_average = get_average_cross_val_score()
+st.write(f'Average Cross-Validation Score: {cv_average}')
 
 #Show feature importances
 plt = feature_importances()
