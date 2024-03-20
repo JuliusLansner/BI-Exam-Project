@@ -69,7 +69,8 @@ def getTree():
  dtree = graphviz.Source(gr_data)
  return dtree
 
-
+decision_tree = getTree()
+decision_tree.render("decision_tree", format='png', cleanup=True)
 
 
 
